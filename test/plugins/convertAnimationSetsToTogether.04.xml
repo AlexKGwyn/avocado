@@ -1,0 +1,31 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector>
+            <path android:name="v" android:pathData="..."/>
+        </vector>
+    </aapt:attr>
+    <target android:name="v">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateY" android:duration="100" android:valueFrom="0" android:valueTo="1" android:valueType="floatType"/>
+                <objectAnimator android:propertyName="translateY" android:duration="300" android:startOffset="100" android:valueFrom="2" android:valueTo="3" android:valueType="floatType"/>
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>
+@@@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector>
+            <path android:name="v" android:pathData="..."/>
+        </vector>
+    </aapt:attr>
+    <target android:name="v">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateY" android:duration="100" android:valueFrom="0" android:valueTo="1" android:valueType="floatType"/>
+                <objectAnimator android:propertyName="translateY" android:duration="300" android:startOffset="100" android:valueFrom="2" android:valueTo="3" android:valueType="floatType"/>
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>
