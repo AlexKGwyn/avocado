@@ -31,6 +31,19 @@ const defaultAttrs: {
     trimPathEnd: 1,
     trimPathOffset: 0,
   },
+  objectAnimator: {
+    startOffset: 0,
+    repeatCount: 0,
+    valueType: 'floatType',
+  },
+  animator: {
+    startOffset: 0,
+    repeatCount: 0,
+    valueType: 'floatType',
+  },
+  set: {
+    ordering: 'together',
+  },
 };
 
 /**
@@ -40,8 +53,21 @@ export function fn(item: JsApi) {
   if (!item.isElem() || !item.attrs) {
     return item;
   }
-  if (item.isElem('vector') || item.isElem('group') || item.isElem('path')) {
-    const elemType = item.elem as 'vector' | 'group' | 'path';
+  if (
+    item.isElem('vector') ||
+    item.isElem('group') ||
+    item.isElem('path') ||
+    item.isElem('objectAnimator') ||
+    item.isElem('animator') ||
+    item.isElem('set')
+  ) {
+    const elemType = item.elem as
+      | 'vector'
+      | 'group'
+      | 'path'
+      | 'objectAnimator'
+      | 'animator'
+      | 'set';
     const defaults = defaultAttrs[elemType];
     Object.keys(defaults).forEach(key => {
       const attrName = `android:${key}`;
