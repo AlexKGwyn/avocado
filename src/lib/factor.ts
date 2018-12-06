@@ -2,7 +2,6 @@ import { js2xml } from './js2xml';
 import { Attr, JsApi } from './jsapi';
 import { findRecursive } from './util';
 import { xml2js } from './xml2js';
-import { js2path } from '../plugins/_path';
 
 const attributeToNameMap = new Map([
   ['android:animation', 'animator'],
@@ -30,17 +29,22 @@ export class Results {
   splits: [string, string][] = [];
 }
 
-export function processFactor(avdName: string, xml: string): Results {
-  xml2xjs(xml, jsApi => {
-      const ret = factor(jsApi, avdName);
-      const results = new Results(toXmlString(jsApi));
-      for (const [file, jsxml] of ret) {
-        results.splits.push([file, toXmlString(jsxml)]);
-      }
-      return results;
-    },
-    _error => return new Results(xml),
-  );
+export function processFactor(avdName: string, xml: string): Promise<Results> {
+  return new Promise((resolve, reject) => {
+    xml2js(
+      xml,
+      jsApi => {
+        const ret = factor(jsApi, avdName);
+        const results = new Results(toXmlString(jsApi));
+        for (const [file, jsxml] of ret) {
+          const xmlString = toXmlString(jsxml);
+          results.splits.push([file, xmlString]);
+        }
+        resolve(results);
+      },
+      _ => resolve(new Results(xml)),
+    );
+  });
 }
 
 function factor(item: JsApi, avdName: string): [string, JsApi][] {
@@ -61,8 +65,8 @@ function factor(item: JsApi, avdName: string): [string, JsApi][] {
   }
 
   for (const nodes of Array.from(attributeMap.values())) {
-    if (nodes.length > 1 && nodes[0].content) {
-      const childNode = nodes[0].content[0];
+    if (nodes.length > 1) {
+      const childNode = nodes[0];
       const attributeName = nodes[0].attr('name').value;
       const attributePrefix = attributeName.split(':')[0];
       const attributeSuffix = attributeName.split(':')[1];
@@ -77,7 +81,21 @@ function factor(item: JsApi, avdName: string): [string, JsApi][] {
       const fileName = resourcePath + '.xml';
       const resourceReference = '@' + resourcePath;
 
-      addStandalone(childNode);
+      const androidNs = {
+        name: 'xmlns:android',
+        prefix: 'xmlns',
+        value: 'http://schemas.android.com/apk/res/android',
+        local: 'android',
+      } as Attr;
+      const aaptNs = {
+        name: 'xmlns:aapt',
+        prefix: 'xmlns',
+        value: 'http://schemas.android.com/aapt',
+        local: 'aapt',
+      } as Attr;
+      childNode.content[0].addAttr(androidNs);
+      childNode.content[0].addAttr(aaptNs);
+
       output.push([fileName, childNode]);
 
       nodes.filter(node => node.parentNode).forEach(node => {
@@ -86,12 +104,12 @@ function factor(item: JsApi, avdName: string): [string, JsApi][] {
           1,
         );
         const ref = {
-          name: attributeSuffix,
+          name: attributeName,
           prefix: attributePrefix,
           value: resourceReference,
-          local: attributeName,
+          local: attributeSuffix,
         } as Attr;
-        node.addAttr(ref);
+        node.parentNode.addAttr(ref);
       });
     }
   }
@@ -101,23 +119,4 @@ function factor(item: JsApi, avdName: string): [string, JsApi][] {
 
 function toXmlString(item: JsApi) {
   return js2xml(item, { pretty: true });
-}
-
-function addStandalone(item: JsApi) {
-  const androidNs = {
-    name: 'android',
-    prefix: 'xmlns',
-    value: 'http://schemas.android.com/apk/res/android',
-    local: 'xmlns:android',
-  } as Attr;
-  const aaptNs = {
-    name: 'aapt',
-    prefix: 'xmlns',
-    value: 'http://schemas.android.com/aapt',
-    local: 'xmlns:aapt',
-  } as Attr;
-
-  item.addAttr(androidNs);
-  item.addAttr(aaptNs);
-  item.parentNode = undefined;
 }

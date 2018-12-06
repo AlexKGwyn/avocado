@@ -15,7 +15,6 @@ import { removeHiddenElems } from '../plugins/removeHiddenElems';
 import { removeXMLProcInst } from '../plugins/removeXMLProcInst';
 import { removeUnusedNames } from '../plugins/removeUnusedNames';
 import { convertAnimationSetsToTogether } from '../plugins/convertAnimationSetsToTogether';
-import { mergeAnimations } from '../plugins/mergeAnimations';
 import { xml2js } from './xml2js';
 import { removeUselessSets } from '../plugins/removeUselessSets';
 
@@ -32,7 +31,6 @@ export const plugins: { [name: string]: Plugin } = {
   removeHiddenElems,
   removeUnusedNames,
   convertAnimationSetsToTogether,
-  mergeAnimations,
   removeUselessSets,
   bakeGroupTransforms,
   collapseGroups,

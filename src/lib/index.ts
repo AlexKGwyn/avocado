@@ -8,6 +8,7 @@ import * as cli from 'commander';
 import { Avocado, Options } from './avocado';
 
 import { js2xml } from './js2xml';
+import { processFactor } from './factor';
 
 import fs = require('fs');
 import path = require('path');
@@ -208,32 +209,46 @@ function processData(
   const startTime = Date.now();
   const prevFileSize = Buffer.byteLength(data, 'utf8');
 
-  return avocado.optimize(data).then(result => {
-    // if (config.datauri) {
-    //   result.data = encodeSVGDatauri(result.data, config.datauri);
-    // }
-    const resultFileSize = Buffer.byteLength(result, 'utf8');
-    const processingTime = Date.now() - startTime;
+  const fileName = output.substring(output.lastIndexOf('/') + 1).split('.')[0];
+  console.log(`File ${fileName}!`);
 
-    return writeOutput(input, output, result).then(
-      () => {
-        if (!config.quiet && output !== '-') {
-          if (input) {
-            console.log(`\n${path.basename(input)}:`);
+  return processFactor(fileName, data).then(result1 => {
+    const outPath = output.substring(0, output.lastIndexOf('/'));
+    result1.splits.forEach(element => {
+      console.log(`Split ${element[0]} as \n ${element[1]}`);
+      const outFile = outPath + '/' + element[0];
+      writeFileFn(outFile, element[1], 'utf8').catch(error =>
+        checkWriteFileError(input, output, data, error),
+      );
+    });
+
+    return avocado.optimize(result1.xml).then(result => {
+      // if (config.datauri) {
+      //   result.data = encodeSVGDatauri(result.data, config.datauri);
+      // }
+      const resultFileSize = Buffer.byteLength(result, 'utf8');
+      const processingTime = Date.now() - startTime;
+
+      return writeOutput(input, output, result).then(
+        () => {
+          if (!config.quiet && output !== '-') {
+            if (input) {
+              console.log(`\n${path.basename(input)}:`);
+            }
+            printTimeInfo(processingTime);
+            printProfitInfo(prevFileSize, resultFileSize);
           }
-          printTimeInfo(processingTime);
-          printProfitInfo(prevFileSize, resultFileSize);
-        }
-      },
-      error =>
-        Promise.reject(
-          new Error(
-            error.code === 'ENOTDIR'
-              ? `Output '${output}' is not a directory.`
-              : error,
+        },
+        error =>
+          Promise.reject(
+            new Error(
+              error.code === 'ENOTDIR'
+                ? `Output '${output}' is not a directory.`
+                : error,
+            ),
           ),
-        ),
-    );
+      );
+    });
   });
 }
 
