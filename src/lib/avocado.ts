@@ -17,6 +17,7 @@ import { removeUnusedNames } from '../plugins/removeUnusedNames';
 import { convertAnimationSetsToTogether } from '../plugins/convertAnimationSetsToTogether';
 import { mergeAnimations } from '../plugins/mergeAnimations';
 import { xml2js } from './xml2js';
+import { removeUselessSets } from '../plugins/removeUselessSets';
 
 // The order is from https://github.com/svg/svgo/blob/master/.svgo.yml
 export const plugins: { [name: string]: Plugin } = {
@@ -32,6 +33,7 @@ export const plugins: { [name: string]: Plugin } = {
   removeUnusedNames,
   convertAnimationSetsToTogether,
   mergeAnimations,
+  removeUselessSets,
   bakeGroupTransforms,
   collapseGroups,
   convertPathData,
