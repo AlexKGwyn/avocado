@@ -71,6 +71,9 @@ function factor(item: JsApi, avdName: string): [string, JsApi][] {
       const attributePrefix = attributeName.split(':')[0];
       const attributeSuffix = attributeName.split(':')[1];
       const filePrefix = getFileNameFromAttribute(attributeName);
+      if (filePrefix === undefined) {
+        continue;
+      }
       const fileNumber = indexMap.has(filePrefix)
         ? indexMap.get(filePrefix)
         : indexMap.set(filePrefix, 1).get(filePrefix);
