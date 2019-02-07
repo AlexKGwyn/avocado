@@ -8,7 +8,7 @@ const attributeToNameMap = new Map([
   ['android:interpolator', 'interpolator'],
 ]);
 function getFileNameFromAttribute(attr: string) {
-  return attributeToNameMap.has(attr) ? attributeToNameMap.get(attr) : attr;
+  return attributeToNameMap.get(attr);
 }
 
 const attributeToResourcePrefixMap = new Map([
